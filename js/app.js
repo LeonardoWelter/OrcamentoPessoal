@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) Leonardo Welter, 2019.
+ * https://github.com/LeonardoWelter
+ */
+
+// Classe de entidade despesa que possui os atributos para a instanciação de novas despesas
 class Despesa {
     constructor(ano, mes, dia, tipo, descricao, valor) {
         this.ano = ano;
@@ -7,7 +13,7 @@ class Despesa {
         this.descricao = descricao;
         this.valor = valor;
     }
-
+    // Método que verifica se algum campo está vazio.
     validarDados() {
         for (let i in this) {
             if (this[i] == undefined || this[i] == '' || this[i] == null) {
@@ -18,8 +24,10 @@ class Despesa {
     }
 }
 
+//Classe que faz a "persistência" das despesas no localStorage
 class BD {
 
+    // Ao instanciar uma classe BD, é verificado qual o ID que foi utilizado por último na persistência das despesas
     constructor() {
         let id = localStorage.getItem('id');
 
@@ -28,11 +36,13 @@ class BD {
         }
     }
 
+    // Retorna o próximo ID disponível para a persistência
     getProximoID() {
         let proximoId = localStorage.getItem('id');
         return parseInt(proximoId) + 1;
     }
 
+    // Persiste o objeto no localStorage
     gravar(d) {
         let id = this.getProximoID();
 
@@ -41,6 +51,7 @@ class BD {
         localStorage.setItem('id', id);
     }
 
+    // Recupera os objetos, em forma de Array, do localStorage
     recuperarRegistros() {
 
         let despesas = Array();
@@ -61,6 +72,7 @@ class BD {
         return despesas;
     }
 
+    // Método responsável por filtrar os objetos persistidos no localStorage para facilitar a localização
     pesquisar(despesa) {
         let despesasFiltradas = Array();
 
@@ -93,6 +105,7 @@ class BD {
         return despesasFiltradas;
     }
 
+    // Método responsável por remover um objeto persistido no localStorage
     remover(id) {
         localStorage.removeItem(id);
     }
@@ -100,6 +113,9 @@ class BD {
 
 let bd = new BD();
 
+// Função responsável intermediar o index.html com o app.js,
+// recupera os valores dos campos, usa-os para instanciar
+// um objeto despesa, valida os valores e os persiste
 function cadastrarDespesa() {
     let ano = document.getElementById('ano')
     let mes = document.getElementById('mes')
@@ -131,6 +147,12 @@ function cadastrarDespesa() {
 
 }
 
+// Função responsável por exibir os objetos persistidos no localStorage
+// na página de consulta, criando as colunas e linhas programaticamente
+// para exibir o número correto de valores.
+// Pode receber como parâmetro um Array e um Boolean, o que significa
+// que a lista deve ser filtrada com base nos parâmetros presentes
+// no Array recebido.
 function carregaListaDespesas(despesas = Array(), filtro = false) {
 
     if (despesas.length == 0 && filtro == false) {
@@ -160,6 +182,9 @@ function carregaListaDespesas(despesas = Array(), filtro = false) {
     });
 }
 
+// Função responsável por realizar a chamada da função carregaListaDespesas
+// enviando um Array e um Boolean para a filtragem dos objetos persistidos
+// conforme input do usuário
 function pesquisarDespesa() {
     let ano = document.getElementById('ano').value;
     let mes = document.getElementById('mes').value;
@@ -175,6 +200,8 @@ function pesquisarDespesa() {
     carregaListaDespesas(despesas, true);
 }
 
+// Função responsável por modificar o Modal que é chamado caso a persistência
+// do objeto seja bem sucedida
 function sucessoGravacao() {
     document.getElementById('registraDespesaTituloClass').className = 'modal-header text-success';
     document.getElementById('registraDespesaTitulo').innerText = 'Registro inserido com sucesso';
@@ -183,6 +210,8 @@ function sucessoGravacao() {
     document.getElementById('registraDespesaBotao').innerText = 'OK';
 }
 
+// Função responsável por modificar o Modal que é chamado caso a persistência
+// do objeto resulte em erro
 function erroGravacao() {
     document.getElementById('registraDespesaTituloClass').className = "modal-header text-danger";
     document.getElementById('registraDespesaTitulo').innerText = 'Erro na gravação';
@@ -191,6 +220,8 @@ function erroGravacao() {
     document.getElementById('registraDespesaBotao').innerText = 'Voltar';
 }
 
+// Converte os tipos de gasto dos números enviados via value para
+// as categorias definidas pelo select
 function converteTipo(t) {
     let tipo = t;
 
@@ -215,6 +246,7 @@ function converteTipo(t) {
     return tipo;
 }
 
+// Realiza a limpeza dos campos, retornando-os ao valor padrão
 function limparCampos() {
     document.getElementById('ano').value = '';
     document.getElementById('mes').value = '';
@@ -224,6 +256,8 @@ function limparCampos() {
     document.getElementById('valor').value = '';
 }
 
+// Realiza a limpeza dos campos e o reload da página para resetar
+// o filtro dos objetos
 function resetarPesquisa() {
     limparCampos()
     pesquisarDespesa();
